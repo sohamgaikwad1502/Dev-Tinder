@@ -14,17 +14,22 @@ connectDb().then(()=>{
     console.log("Cannot Connect to Database",err);
 })
 
+//middleware which converts json to js object so that js can understand it
+app.use(express.json())
+
 app.post("/signup",async (req,res) =>
 { 
 
     // new instace of new user model
-    const user = new User({
-        firstName : "Sachin",
-        lastName : "Tendulkar",
-        emailId : "sachin@tendulkar",
-        password : "sachin@century",
-        age:60,
-    });
-    await user.save(); 
-    res.send("Data Saved Successfully!!");
+    console.log(req.body);
+    const user = new User(req.body);
+    try{
+        await user.save(); 
+        res.send("Data Saved Successfully!!");
+    }
+    catch(err)
+    {
+        res.status(401).send("Error Saving the User data" + err.message )
+    }
+    
 })
