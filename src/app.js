@@ -1,8 +1,18 @@
 const express = require("express");
-const validation = require("validator");
 const {connectDb} = require("./config/database.js");
 const User = require("./models/user.js")
 const app = express();
+const {isUpdateAllowed} = require("./utils/validations.js");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth.js");
+
+//middleware which converts json to js object so that js can understand it
+app.use(express.json());
+//middleware to parse the cookie
+app.use(cookieParser());
+
 
 connectDb().then(()=>{
     console.log("Connected to database Successfully")
@@ -15,21 +25,23 @@ connectDb().then(()=>{
     console.log("Cannot Connect to Database",err);
 })
 
-//middleware which converts json to js object so that js can understand it
-app.use(express.json())
+
 
 app.post("/signup",async (req,res) =>
 { 
 
     // new instace of new user model
     console.log(req.body);
-    const user = new User(req.body);
-    const emailId = req.body.emailId;
+    const { firstName, lastName , emailId , password ,age , gender ,photoUrl , about, skills} = req.body;
+    
+    const passwordHash = await bcrypt.hash(password,10);
+
+    const user = new User({
+        firstName , lastName, emailId , password : passwordHash , age , gender ,photoUrl , about, skills 
+    });
+
     try{
-        // if (!validation.isEmail(emailId))
-        // {
-        //     throw new Error("Email is not valid");
-        // }
+        
         await user.save(); 
         res.send("Data Saved Successfully!!");
     }
@@ -40,105 +52,47 @@ app.post("/signup",async (req,res) =>
     
 })
 
-app.get("/user", async (req,res) =>
-{
-    const email =  req.body.emailId;
-    try {
-        const userfromdb = await User.find({emailId : email});
-        (userfromdb.length === 0 ) ? res.status(404).send("User Not Found") : res.send(userfromdb) ;
-    }
-    catch(error) 
-    {
-        res.status(404).send("Record Not Found" + error)
-    }
-    
-})
+//login API 
 
-app.get("/feed",async(req,res) =>
-{
-    try
-    {
-        const alldata = await User.find({});
-        res.send(alldata);
-    }
-    catch(err)
-    {
-        res.status(404).send("No data Found");
-    }
-})
 
-app.get("/getone" , async (req, res) =>
+app.post("/login", async(req, res,next)=>
 {
-    const emailtofind = req.body.emailId;
-    try
-    {
-        const document = await User.findOne({emailId : emailtofind});
-        (document) ? res.send(document) : res.send("No Data Found");
-        
+    try{
+        const {emailId,password} = req.body;
+        const user = await User.findOne({emailId:emailId})
+        if(user)
+        {
+            const valid = await bcrypt.compare(password,user.password)  
+            if(valid) 
+            {
+                const token = jwt.sign({_id:user._id},"DEV@Tinder$6969");
+                console.log(token);
+                res.cookie("token",token)
+                res.send("Login Successfull")
+            }
+            else {
+                throw new Error("Invalid Credentials")
+            }
+
+        }
+        else {throw new Error("Invalid credentials")}
     }
     catch(error)
     {
-        res.status(404).send("Error Occured" + error);
+        res.send(error.message);
     }
+})
+
+app.get("/profile",userAuth, async (req,res) =>   
+{
+    try {
+        res.send(req.user);
+    }
+    catch(error)
+    {
+        res.send(error.message); 
+    }
+
 })
 
 //Delete api 
-
-app.delete("/delete", async (req,res) =>
-{
-    const userId = req.body.userId;
-    try {
-        await User.findByIdAndDelete(userId);
-        res.send("Data Deleted Successfully");
-    }
-    catch(err)
-    {
-        res.status(404).send("Error Deleting Data" + err);
-    } 
-})
-
-//Update API
-app.patch("/update", async (req,res) => 
-{
-    const emailId = req.body.emailId;
-    const updateData = req.body;
-    
-    try 
-    {
-        if (!validation.isEmail(emailId))
-        {
-            throw new Error("Email is not valid");
-        }
-        await User.findOneAndUpdate({emailId},updateData,{runValidators: true});
-        res.send("Data Updated Successfully");
-    }
-    catch(err)
-    {
-        res.status(404).send(err.message)
-    }
-})
-
-app.patch("/updateBasedOnId/:userId" , async(req,res) =>
-{
-    const userId = req.params?.userId;
-    const data = req.body;
-    
-
-    try 
-    {
-        //Api level Validations
-        const ALLOWED_CHANGES = ["photoUrl","about","gender","age","skills"]
-        const isUpdateAllowed =  Object.keys(data).every(k => ALLOWED_CHANGES.includes(k))
-
-        if(!isUpdateAllowed)
-        {
-            throw new Error("Update Not Allowed");
-        }
-        await User.findByIdAndUpdate(userId,data,{runValidators : true});
-        res.send("Data Updated Successfully")
-    }
-    catch(err)
-    {
-        res.status(404).send(err.message);
-    }
-})
