@@ -2,6 +2,7 @@ const express = require("express");
 const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user.js")
+const userAuth = require("../middlewares/auth.js")
 
 authRouter.post("/signup",async (req,res) =>
     { 
@@ -53,5 +54,15 @@ authRouter.post("/login", async(req, res)=>
     }
 })
 
+authRouter.post("/logout",async(req,res) => {
+    res.cookie("token" , null , {
+        expires: new Date(Date.now())
+    });
+    res.send("logout Successfull !");
+})
+
+
+
+// created a router named authRouter and exported it 
 module.exports = authRouter;
 

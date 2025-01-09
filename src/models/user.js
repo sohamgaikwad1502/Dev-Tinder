@@ -78,7 +78,8 @@ const userSchema = mongoose.Schema({
     about : 
     {
         type : String,
-        default : "This is the default about of the User"
+        default : "This is the default about of the User",
+        maxLength : [50,"About cannot exceed length of 50 characters "]
     },
     skills : 
     {
