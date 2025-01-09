@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const userAuth = async (req,res,next) =>{
-    const {token }= req.cookies;
     try 
     {
+        const {token }= req.cookies;
         if(token)
         {
             const verify = jwt.verify(token, "DEV@Tinder$6969");
@@ -32,7 +32,7 @@ const userAuth = async (req,res,next) =>{
     }
     catch(error)
     {
-        res.send(error.message);
+        res.send(error);
     }
 }
 
