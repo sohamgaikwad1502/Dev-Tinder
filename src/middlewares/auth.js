@@ -22,7 +22,6 @@ const userAuth = async (req,res,next) =>{
                 {
                     throw new Error("User Not Found");
                 }
-                
             }
         }
         else 
