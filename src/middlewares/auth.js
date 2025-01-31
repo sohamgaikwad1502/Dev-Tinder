@@ -1,38 +1,28 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const userAuth = async (req,res,next) =>{
-    try 
-    {
-        const {token }= req.cookies;
-        if(token)
-        {
-            const verify = jwt.verify(token, "DEV@Tinder$6969");
-    
-            if(verify._id)
-            {
-                const user = verify._id;
-                const user_data = await User.findById(user);
-                if(user_data)
-                {
-                    req.user = user_data;
-                    next();
-                }
-                else 
-                {
-                    throw new Error("User Not Found");
-                }
-            }
+const userAuth = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
+    if (token) {
+      const verify = jwt.verify(token, "DEV@Tinder$6969");
+
+      if (verify._id) {
+        const user = verify._id;
+        const user_data = await User.findById(user);
+        if (user_data) {
+          req.user = user_data;
+          next();
+        } else {
+          throw new Error("User Not Found");
         }
-        else 
-        {
-            throw new Error("No Token Found");
-        }  
+      }
+    } else {
+      throw new Error("No Token Found");
     }
-    catch(error)
-    {
-        res.status(404).send(error);
-    }
-}
+  } catch (error) {
+    res.status(401).send(error.message);
+  }
+};
 
-module.exports = {userAuth};
+module.exports = { userAuth };
