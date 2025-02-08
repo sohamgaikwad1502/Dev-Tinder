@@ -6,8 +6,9 @@ const { run } = require("./sendEmail");
 cron.schedule("00 09 * * *", async () => {
   try {
     const yesterday = subDays(new Date(), 1);
-    const yesterdayStart = startOfDay(yesterday);
-    const yesterdayEnd = endOfDay(yesterday);
+
+    const yesterdayStart = new Date(startOfDay(yesterday).toISOString());
+    const yesterdayEnd = new Date(endOfDay(yesterday).toISOString());
 
     const pendingRequests = await ConnectionRequest.find({
       connectionStatus: "interested",
@@ -17,7 +18,6 @@ cron.schedule("00 09 * * *", async () => {
       },
     }).populate("fromConnectionId toConnectionId");
 
-    console.log(pendingRequests);
     const listOfEmails = [
       ...new Set(pendingRequests.map((req) => req.toConnectionId.emailId)),
     ];
@@ -28,13 +28,11 @@ cron.schedule("00 09 * * *", async () => {
           "New Friend Request Pending from :" + email,
           "Login to Dev tinder to accept or reject the requests"
         );
-        console.log(res);
       } catch (error) {
-        console.log(error);
+        console.log(error + "---error in sending mail");
       }
     }
-    console.log(listOfEmails);
   } catch (error) {
-    console.log(error);
+    console.log(error + "---error in cron schedule");
   }
 });

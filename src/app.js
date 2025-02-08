@@ -1,11 +1,14 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
 const { connectDb } = require("./config/database.js");
+const { initSocket } = require("./utils/socket.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const dotenv = require("dotenv");
+require("./utils/cronJobs");
 
-dotenv.config();
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -26,10 +29,12 @@ app.use("/", profile);
 app.use("/", request);
 app.use("/", user);
 
+initSocket(server);
+
 connectDb()
   .then(() => {
     console.log("Connected to database Successfully");
-    app.listen(process.env.PORT_NUMBER, () => {
+    server.listen(process.env.PORT_NUMBER, () => {
       console.log("Server is Running");
     });
   })
