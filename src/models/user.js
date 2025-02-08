@@ -64,7 +64,7 @@ const userSchema = mongoose.Schema(
     about: {
       type: String,
       default: "This is the default about of the User",
-      maxLength: [50, "About cannot exceed length of 50 characters "],
+      maxLength: [250, "About cannot exceed length of 250 characters "],
     },
     skills: {
       type: [String],
@@ -83,7 +83,6 @@ userSchema.methods.generateJwtToken = function () {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_TOKEN_PASS);
   return token;
 };
-
 
 userSchema.methods.validatePassword = async function (userPassword) {
   const user = this;

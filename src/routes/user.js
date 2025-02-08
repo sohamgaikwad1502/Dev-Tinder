@@ -3,7 +3,6 @@ const userRouter = express.Router();
 const { userAuth } = require("../middlewares/auth.js");
 const { ConnectionRequest } = require("../models/Connections.js");
 const User = require("../models/user.js");
-
 const USER_SAFE_DATA = "firstName lastName photoUrl about skills";
 
 userRouter.get("/user/request/getconnections", userAuth, async (req, res) => {

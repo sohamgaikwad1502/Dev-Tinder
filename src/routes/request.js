@@ -3,6 +3,7 @@ const requestRouter = express.Router();
 const { userAuth } = require("../middlewares/auth.js");
 const { ConnectionRequest } = require("../models/Connections.js");
 const User = require("../models/user.js");
+const sendEmail = require("../utils/sendEmail.js");
 
 requestRouter.post(
   "/request/send/:status/:toUserId",
@@ -46,6 +47,14 @@ requestRouter.post(
       });
       // saving the new created object to db
       const data = await connectionRequest.save();
+
+      const subject = "Request Received From : " + req.user.emailId;
+      const body = req.user.firstName + " Wants to connect with You !!";
+
+      const emailResponse = await sendEmail.run(subject, body);
+      console.log(emailResponse);
+      console.log("Reached here");
+
       res.json({
         message: `${req.params.status} request is sent from ${req.user.firstName} to ${toConnectionIdExist.firstName}`,
         data,
