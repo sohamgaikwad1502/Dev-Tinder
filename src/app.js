@@ -9,9 +9,16 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("./utils/cronJobs");
 
+const allowedOrigins = ["http://localhost:5124", "http://localhost:5173"];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
@@ -23,11 +30,13 @@ const auth = require("./routes/auth.js");
 const profile = require("./routes/profile.js");
 const request = require("./routes/request.js");
 const user = require("./routes/user.js");
+const chat = require("./routes/chat.js");
 
 app.use("/", auth);
 app.use("/", profile);
 app.use("/", request);
 app.use("/", user);
+app.use("/", chat);
 
 initSocket(server);
 
