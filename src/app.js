@@ -9,16 +9,9 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("./utils/cronJobs");
 
-const allowedOrigins = ["http://localhost:5173"];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      }
-    },
+    origin: "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   })
