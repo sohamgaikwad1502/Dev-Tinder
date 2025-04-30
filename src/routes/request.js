@@ -45,15 +45,12 @@ requestRouter.post(
         toConnectionId,
         connectionStatus,
       });
-      // saving the new created object to db
       const data = await connectionRequest.save();
 
       const subject = "Request Received From : " + req.user.emailId;
       const body = req.user.firstName + " Wants to connect with You !!";
 
       const emailResponse = await sendEmail.run(subject, body);
-      console.log(emailResponse);
-      console.log("Reached here");
 
       res.json({
         message: `${req.params.status} request is sent from ${req.user.firstName} to ${toConnectionIdExist.firstName}`,

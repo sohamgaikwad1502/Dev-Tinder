@@ -31,6 +31,19 @@ app.use("/", request);
 app.use("/", user);
 app.use("/", chat);
 
+const isCrossOrigin = process.env.IS_CROSS_ORIGIN;
+
+const reRun = () => {
+  setInterval(async () => {
+    try {
+      const response = await fetch(process.env.RENDER_URL);
+      console.log("Refresh Request send ", response.status);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, 840000);
+};
+
 initSocket(server);
 
 connectDb()
@@ -39,6 +52,7 @@ connectDb()
     server.listen(process.env.PORT_NUMBER, () => {
       console.log("Server is Running");
     });
+    if (isCrossOrigin === "true") reRun();
   })
   .catch((err) => {
     console.log("Cannot Connect to Database", err);

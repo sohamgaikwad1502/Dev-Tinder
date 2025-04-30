@@ -4,14 +4,14 @@ const initSocket = (server) => {
   const socket = require("socket.io");
   const io = socket(server, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:5173",
     },
   });
 
   io.on("connection", (socket) => {
     socket.on("joinChat", ({ userId, targetUserId, firstName }) => {
       const roomId = [userId, targetUserId].sort().join("_");
-      console.log("Joining Room ID : " + "of" + firstName, roomId);
+      // console.log("Joining Room ID : " + "of" + firstName, roomId);
       socket.join(roomId);
     }),
       socket.on(
@@ -19,7 +19,6 @@ const initSocket = (server) => {
         async ({ firstName, targetUserId, userId, text }) => {
           try {
             const roomId = [userId, targetUserId].sort().join("_");
-            console.log(firstName + " " + text);
             let chat = await Chat.findOne({
               participants: { $all: [userId, targetUserId] },
             });

@@ -7,7 +7,6 @@ const isUpdateAllowed = (data) => {
 const emailCheck = (emailId) => {
   return validator.isEmail(emailId);
 };
-module.exports = { isUpdateAllowed, emailCheck };
 
 const isDataEditable = (req, res) => {
   const userInput = req.body;
@@ -54,4 +53,10 @@ const validatePassword = (password) => {
   }
 };
 
-module.exports = { isDataEditable, validateGender, validatePassword };
+module.exports = {
+  isUpdateAllowed,
+  emailCheck,
+  isDataEditable,
+  validateGender,
+  validatePassword,
+};
