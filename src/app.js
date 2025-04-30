@@ -14,8 +14,18 @@ app.use(
     origin: process.env.CLIENT,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.options(
+  "*",
+  cors({
+    origin: process.env.CLIENT,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 
