@@ -11,11 +11,10 @@ require("./utils/cronJobs");
 
 app.use(
   cors({
-    origin: process.env.CLIENT,
-    credentials: true,
+    origin: process.env.CLIENT ? process.env.CLIENT.split(",") : [],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["set-cookie"],
+    credentials: true,
   })
 );
 
