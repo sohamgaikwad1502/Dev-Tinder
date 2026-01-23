@@ -46,7 +46,7 @@ authRouter.post("/signup", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: isHTTPS,
-      sameSite: isCrossOrigin ? "None" : undefined,
+      sameSite: isCrossOrigin ? "None" : "Lax",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     res.json({ message: "Data Saved Successfully!!", user });
@@ -68,7 +68,7 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         httpOnly: true,
         secure: isHTTPS,
-        sameSite: isCrossOrigin ? "None" : undefined,
+        sameSite: isCrossOrigin ? "None" : "Lax",
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
       res.send(user);
@@ -76,7 +76,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials");
     }
   } catch (error) {
-    res.status(401).send(error);
+    res.status(401).send(error.message);
   }
 });
 
@@ -84,7 +84,7 @@ authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
     httpOnly: true,
     secure: isHTTPS,
-    sameSite: isCrossOrigin ? "None" : undefined,
+    sameSite: isCrossOrigin ? "None" : "Lax",
     expires: new Date(Date.now()),
   });
   res.send("logout Successfull !");
